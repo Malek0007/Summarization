@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Summarizer</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e2e6e6;
+            margin: 0;
+            padding: 0;
+        }
+        textarea {
+    background-color: rgb(255, 247, 248);
+}
+
+        p{
+            color: #4ad6ef;
+            font-weight: 900;
+            font-size: 20px;
+        }
+        h2 {
+            text-align: center;
+            font-family: cursive;
+            font-size: 40px;
+            color: #ce1ece;
+            font-weight: 900;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 40px;
+            
+        }
+        .container form {
+            width: 80%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .container textarea {
+            width: 100%;
+            height: 200px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+        }
+        .container input[type="range"] {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .container button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition-duration: 0.4s;
+            
+        }
+        .container button[type="submit"] {
+            background-color: #00a7ba;
+        }
+        .container button[type="reset"] {
+            background-color: #d037c6;
+        }
+        .container button:hover {
+            background-color: #555;
+        }
+        .container p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.container input[type="range"] {
+    margin-top: 5px;
+}
+
+.container button[type="reset"] {
+    margin-left: 10px;
+}
+
+.container button[type="submit"] {
+    margin-top: 10px;
+}
+
+.container textarea[name="result"] {
+    margin-top: 20px;
+}
+
+.container textarea,
+.container input[type="range"] {
+    transition: all 0.3s ease;
+}
+
+.container textarea:focus,
+.container input[type="range"]:focus {
+    border-color: #009688;
+    box-shadow: 0 0 5px rgba(0, 150, 136, 0.5);
+}
+
+.container button[type="submit"],
+.container button[type="reset"] {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.container button[type="submit"]:hover,
+.container button[type="reset"]:hover {
+    background-color: #45a049;
+}
+
+.container button[type="submit"]:focus,
+.container button[type="reset"]:focus {
+    outline: none;
+}
+
+.container button[type="reset"] {
+    background-color: #e74ed0;
+}
+
+.container button[type="reset"]:hover {
+    background-color: #d32f2f;
+textarea{
+    color: #22949f;
+
+}
+    </style>
+    <script>
+        function countWordsWithoutSpaces(text) {
+            return text.trim().split(/\s+/).length;
+        }
+
+        function updateSummaryLength(value) {
+            var text = document.getElementById('data').value;
+            var wordCount = countWordsWithoutSpaces(text);
+            var maxSummaryLength = Math.min(value, wordCount);
+            document.getElementById('summaryLength').textContent = maxSummaryLength;
+            document.getElementById('maxL').max = wordCount;
+            document.getElementById('maxL').value = maxSummaryLength;
+            localStorage.setItem('maxSummaryLength', maxSummaryLength);
+        }
+
+        function initialWordCount() {
+            var text = document.getElementById('data').value.trim(); // Trim whitespace
+            var wordCount = text === "" ? 0 : countWordsWithoutSpaces(text); // Adjust for empty input
+            document.getElementById('initialWordCount').textContent = wordCount;
+            document.getElementById('maxL').max = wordCount;
+
+            // Restore summary length from local storage
+            var storedSummaryLength = localStorage.getItem('maxSummaryLength');
+            if (storedSummaryLength !== null) {
+                document.getElementById('maxL').value = storedSummaryLength;
+                document.getElementById('summaryLength').textContent = storedSummaryLength;
+            }
+        }
+
+        window.onload = initialWordCount;
+
+        function submitForm() {
+            var initialText = document.getElementById('data').value; // Store the initial text
+            document.getElementById('textToKeep').value = initialText; // Keep the initial text in a hidden input field before submitting
+        }
+    </script>
+</head>
+<body>
+    
+    <div class="container">
+        <h2>Text Summarizer</h2>
+        <form action="{{ url_for('Summarize') }}" method="post" onsubmit="submitForm()">
+            <p>Enter your text here :</p>
+            <textarea name="data" id="data" cols="30" rows="10" placeholder="Enter your data" required oninput="initialWordCount()">{{ data }}</textarea>
+            <input type="hidden" name="textToKeep" id="textToKeep" value="">
+            <p>Word Count: <span id="initialWordCount"></span></p>
+            <textarea name="result" cols="30" rows="10" placeholder="Your summarized text">{{ result }}</textarea>
+            <input type="range" min="20" id="maxL" name="maxL" oninput="updateSummaryLength(this.value)">
+            <p>Summary Length : <span id="summaryLength"></span></p>
+            
+            <button type="submit">Submit</button>
+            <button type="reset" onclick="clearText()">Reset</button>
+        </form>
+    </div>
+
+    <script>
+        function clearText() {
+            document.getElementById('data').value = '';
+            document.getElementById('result').value = '';
+            localStorage.removeItem('maxSummaryLength');
+        }
+    </script>
+</body>
+</html>
