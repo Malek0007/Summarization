@@ -11,7 +11,7 @@ def Index():
 def Summarize():
     if request.method == 'POST':
         API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
-        TOKEN = "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"  # Your Hugging Face API token
+        TOKEN = " Your Hugging Face API token"  
         headers = {"Authorization": f"Bearer {TOKEN}"}
         min_length = 20
         max_length = int(request.form["maxL"])
